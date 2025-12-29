@@ -1,0 +1,82 @@
+name: CI - Terraform HCL Lint
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-validate:
+    name: Lint and Validate Terraform
+    runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_environment: dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+          terraform_version: 1.7.5
+
+      - name: Show Terraform version
+        run: terraform -version
+
+      - name: Initialize Terraform (no backend)
+        working-directory: aws-secrets-encryption
+        run: terraform init -backend=false
+
+      - name: Terraform Format (check only)
+        working-directory: aws-secrets-encryption
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        working-directory: aws-secrets-encryption
+        run: terraform validate
+
+      - name: Install TFLint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Create TFLint config if missing
+        working-directory: aws-secrets-encryption
+        run: |
+          if [ ! -f .tflint.hcl ]; then
+            cat > .tflint.hcl <<'EOF'
+plugin "aws" {
+  enabled = true
+  version = "0.31.0"
+  source  = "github.com/terraform-linters/tflint-ruleset-aws"
+}
+config {
+  call_module_type = "all"
+}
+EOF
+          fi
+
+      - name: Initialize TFLint
+        working-directory: aws-secrets-encryption
+        run: tflint --init
+
+      - name: Run TFLint (root)
+        working-directory: aws-secrets-encryption
+        run: tflint --format compact
+
+      - name: Run TFLint (modules)
+        working-directory: aws-secrets-encryption/modules
+        run: |
+          for dir in */ ; do
+            echo "Running tflint in module: $dir"
+            (cd "$dir" && tflint --format compact) || exit 1
+          done

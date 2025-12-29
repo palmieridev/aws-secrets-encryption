@@ -1,0 +1,59 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*.tfvars
+*.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+terraform.tfvars
+*.tfplan
+
+# Ignore local backend files if used
+terraform.tfstate.d/
+
+# Python (Lambda) artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+*.whl
+.build/
+dist/
+.env
+.env.*
+venv/
+.venv/
+pip-wheel-metadata/
+.pytest_cache/
+coverage.xml
+htmlcov/
+.pyre/
+.mypy_cache/
+
+# Lambda build outputs
+*.zip
+modules/secrets-manager/lambda/*.zip
+
+# OS / editor noise
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Icon?
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Misc tooling caches
+.npm/
+node_modules/

@@ -1,0 +1,44 @@
+aws_region = "us-east-1"
+project_name = "secrets-encryption"
+environment  = "dev"
+
+# Common tags applied to all resources
+common_tags = {
+  Project   = "secrets-encryption"
+  Environment = "dev"
+  ManagedBy = "Terraform"
+}
+
+# KMS
+enable_key_rotation  = true
+kms_deletion_window  = 30
+kms_admin_role_arns  = []
+kms_user_role_arns   = []
+
+# Secrets Manager
+enable_secret_rotation = true
+secret_rotation_days   = 30
+secret_recovery_window = 7
+
+# Initial database credentials (passwords are generated via random_password)
+database_credentials = {
+  username = "admin"   # placeholder, do not use hardcoded credentials in apps
+  database = "appdb"
+}
+
+# RDS Networking (replace with your VPC and subnets)
+vpc_id     = "vpc-xxxxxxxx"
+subnet_ids = [
+  "subnet-aaaaaaaa",
+  "subnet-bbbbbbbb",
+  "subnet-cccccccc",
+]
+
+# RDS Instance configuration
+db_instance_class        = "db.t3.micro"
+db_allocated_storage     = 20
+db_engine_version        = "15.4"
+db_backup_retention      = 7
+db_enabled_cloudwatch_logs = ["postgresql", "upgrade"]
+project_name = "secrets-encryption"
+environment  = "dev"
